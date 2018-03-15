@@ -1,10 +1,12 @@
 import React, { Component } from 'react';
+import Scoreboard from './Scoreboard';
+import './App.css'
 
 class App extends Component {
 	render () {
 		return (
-			<div>TANKS</div>
-		)
+			<Scoreboard />
+		);
 	}
 }
 
