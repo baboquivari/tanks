@@ -11,7 +11,7 @@ class Scoreboard extends Component {
             players: [],
             formValue: ''
         }
-        
+
         this.onPlayerSubmit = this.onPlayerSubmit.bind(this);
         this.onFormInput = this.onFormInput.bind(this);
     }
@@ -19,11 +19,13 @@ class Scoreboard extends Component {
     render () {
         return (
             <div className="scoreboard">
-                <Board />
-                <AddPlayerForm 
+                <Board
+                    players={this.state.players}
+                />
+                <AddPlayerForm
                     onPlayerSubmit={this.onPlayerSubmit}
-                    onFormInput={this.onFormInput}  
-                    formValue={this.state.formValue}  
+                    onFormInput={this.onFormInput}
+                    formValue={this.state.formValue}
                 />
             </div>
         )

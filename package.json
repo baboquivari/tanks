@@ -10,8 +10,8 @@
   "license": "ISC",
   "dependencies": {
     "bulma": "^0.4.2",
-    "react": "^15.6.1",
-    "react-dom": "^15.6.1",
+    "react": "16.2.0",
+    "react-dom": "^16.2.0",
     "superagent": "^3.5.2"
   },
   "devDependencies": {
