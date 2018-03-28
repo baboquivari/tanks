@@ -9,3 +9,7 @@ PlayingField Component
 - Needs to know who's turn it is to generate tank position
 - Eventually needs to update score after each round (when every player in the game has taken a turn)
 - Should keep track of each 'tile' and it's state. eg: tile B2 has a hit marker from Player 1 and tile A4 has a position marker from Player 1 etc
+
+------------
+
+THURSDAY SESSION

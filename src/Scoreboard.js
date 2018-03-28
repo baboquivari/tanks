@@ -14,6 +14,7 @@ class Scoreboard extends Component {
 
         this.onPlayerSubmit = this.onPlayerSubmit.bind(this);
         this.onFormInput = this.onFormInput.bind(this);
+        this.handleScoreUpdate = this.handleScoreUpdate.bind(this);
     }
 
     render () {
@@ -21,6 +22,7 @@ class Scoreboard extends Component {
             <div className="scoreboard">
                 <Board
                     players={this.state.players}
+                    handleScoreUpdate={this.handleScoreUpdate}
                 />
                 <AddPlayerForm
                     onPlayerSubmit={this.onPlayerSubmit}
@@ -49,6 +51,27 @@ class Scoreboard extends Component {
             }),
             formValue: ''
         })
+    }
+
+    handleScoreUpdate (i, event) {
+        const scoreUpdate = event.target.innerHTML;
+        const playerIndex = i;
+
+        const updatedPlayers = this.state.players.map((player, i) => {
+            if (playerIndex === i) {
+                scoreUpdate == '+' ?
+                    player.score++ :
+                    player.score !== 0 ? player.score-- : null;
+
+                return player;
+            }
+            return player;
+        })
+
+        this.setState({
+            players: updatedPlayers
+        })
+
     }
 }
 

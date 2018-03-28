@@ -2,11 +2,18 @@ import React, { Component } from 'react';
 
 // STATELESS COMPONENT, child of Scoreboard.js
 function Board (props) {
-    const players = props.players;
+    const { players, handleScoreUpdate} = props;
 
-    return players.map(function (player) {
+    return players.map((player, i) => {
         return (
-            <div> { player.name } </div>
+            <div className="playerInfo" key={i}>
+                <span>{ player.name }</span>
+                <span className="playerScoreButtons">
+                    <button onClick={handleScoreUpdate.bind(null, i)}>-</button>
+                    <span> Score: { players[i].score } </span>
+                    <button onClick={handleScoreUpdate.bind(null, i)}>+</button>
+                </span>
+            </div>
         )
     })
 }

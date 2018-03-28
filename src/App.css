@@ -11,3 +11,10 @@
 .addPlayerForm {
   border: 1px solid pink;
 }
+
+/* // SCOREBOARD - Player info */
+
+.playerInfo {
+  display: flex;
+  justify-content: space-between;
+}
