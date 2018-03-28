@@ -47,7 +47,7 @@ class Scoreboard extends Component {
             players: this.state.players.concat({
                 name: this.state.formValue,
                 score: 0,
-                id: Math.random() * 10
+                id: (Math.random() * 100000).toFixed(0)
             }),
             formValue: ''
         })
