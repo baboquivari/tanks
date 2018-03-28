@@ -1,6 +1,6 @@
 .scoreboard {
   border: 1px solid blue;
-  height: 200px;
+  height: 150px;
   width: 500px;
 }
 
@@ -17,4 +17,20 @@
 .playerInfo {
   display: flex;
   justify-content: space-between;
+}
+
+/* // PLAYING FIELD */
+
+.playingField {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-around;
+  border: 1px solid red;
+  height: 300px;
+  width: 500px;
+}
+
+.gridBox {
+  border: 1px solid pink;
+  flex: 0 0 32%;
 }
