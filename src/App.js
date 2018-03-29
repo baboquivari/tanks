@@ -61,20 +61,10 @@ class Scoreboard extends Component {
         })
     }
 
-    handleScoreUpdate (i, event) {
-        const scoreUpdate = event.target.innerHTML;
-        const playerIndex = i;
+    handleScoreUpdate (playerArrID, buttonType) {
+		let updatedPlayers = this.state.players;
 
-        const updatedPlayers = this.state.players.map((player, i) => {
-            if (playerIndex === i) {
-                scoreUpdate == '+' ?
-                    player.score++ :
-                    player.score !== 0 ? player.score-- : null;
-
-                return player;
-            }
-            return player;
-        })
+		buttonType === 'plus' ? updatedPlayers[playerArrID].score++ : updatedPlayers[playerArrID].score--;
 
         this.setState({
             players: updatedPlayers
