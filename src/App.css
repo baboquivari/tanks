@@ -23,11 +23,23 @@
 
 .playingField {
   display: grid;
-  grid-template-columns: 1fr 1fr 1fr;
+  grid-template-columns: repeat(2, 1fr);
   grid-gap: 5px;
   border: 1px solid red;
 }
 
 .gridBox {
   border: 1px solid pink;
+}
+
+.pf-2{
+  grid-template-columns: repeat(3, 1fr);
+}
+
+.pf-3{
+  grid-template-columns: repeat(4, 1fr);
+}
+
+.pf-4{
+  grid-template-columns: repeat(5, 1fr);
 }

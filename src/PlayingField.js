@@ -9,7 +9,7 @@ const PlayingField = (props) => {
 
     return new Array(gridSize).fill('').map((ele, i) => {
         return (
-            <div className="gridBox" key={i} style={calculateGridProportions(numOfPlayers)}> {i+1} </div>
+            <div className="gridBox" key={i}> {i+1} </div>
         )
     })
 
