@@ -1,10 +1,13 @@
 import React, { Component } from 'react';
 
+// STATELESS COMPONENT, child of Scoreboard.js
 function StatusBar (props) {
+    const { handleStartGame } = props;
+
     return (
-        <div>
-            <p> STATUS </p>
-            <button className="startGameButton" onClick={props.handleGameStart}>START GAME</button>
+        <div className="StatusBar">
+            STATUSBAR
+            <button onClick={handleStartGame}>Start Game</button>
         </div>
     )
 }
