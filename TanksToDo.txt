@@ -19,4 +19,20 @@ THURSDAY SESSION
 - Get the grid to produce dynamic size based on players. Agree on size? 2 players = 3x3, 3p = 5x5, 4p = 7x7
 SHOW MINE and then let someone lead it?
 
--
+- Add Remove Player Button?
+
+- Get the statusBar showing useful shit, eg:
+Start of Game : PLAYERS, ENTER THE GAME!
+StartButton Clicked: ${playerName}, take the computer and take your go!
+...
+So.. I guess the Player who's taking his go has 2 stages to it. 1) Select a square to bomb 2) Select a square to move to.
+The statusBar needs to say like "Destroy your enemy" and then "Move, soldier!".
+The grid needs to render a little tank in a random square at first to show player position.
+It needs to render a little explosion 'hit marker' when player clicks a square to bomb.
+
+... When the player has moved, then grid needs to UNSHOW all the info on the grid so the next player doesn't see.
+
+... I guess this process keeps going until a player is hit (do you just have one life?). When that happens, the statusbar updates
+with something like JIM, YOU ARE DEAD. And then a Play Again button appears.
+
+How many rounds are we gonna have? Just 1? If you can set the rounds, we need to implement that later as non MVP functionality.
