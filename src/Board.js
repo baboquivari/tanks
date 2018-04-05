@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 
 // STATELESS COMPONENT, child of Scoreboard.js
 function Board (props) {
-    const { players, handleScoreUpdate } = props;
+    const { players, handleScoreUpdate, handleRemovePlayer } = props;
 
     return players.map((player, i) => {
         return (
@@ -12,6 +12,7 @@ function Board (props) {
                     <button onClick={handleScoreUpdate.bind(null, i, 'minus')}>-</button>
                     <span> Score: { players[i].score } </span>
                     <button onClick={handleScoreUpdate.bind(null, i, 'plus')}>+</button>
+                    <button className="removePlayerButton" onClick={handleRemovePlayer.bind(null, i)}> X </button>
                 </span>
             </div>
         )

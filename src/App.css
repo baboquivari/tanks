@@ -22,15 +22,12 @@
 /* // PLAYING FIELD */
 
 .playingField {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: space-around;
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  grid-gap: 5px;
   border: 1px solid red;
-  height: 300px;
-  width: 100%;
 }
 
 .gridBox {
   border: 1px solid pink;
-  /* flex: 0 0 32%; */
 }

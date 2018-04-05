@@ -5,12 +5,12 @@ function AddPlayerForm (props) {
     return (
         <div className="addPlayerForm">
             <form>
-                <input 
+                <input
                     type="text"
                     value={props.formValue}
                     onChange={props.onFormInput}
                 ></input>
-                <button 
+                <button
                     type="submit"
                     onClick={props.onPlayerSubmit}
                 >Add Player

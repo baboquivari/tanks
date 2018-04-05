@@ -3,6 +3,7 @@ import Board from './Board';
 import AddPlayerForm from './AddPlayerForm';
 import PlayingField from './PlayingField';
 import StatusBar from './StatusBar';
+import { SSL_OP_ALL } from 'constants';
 
 class Scoreboard extends Component {
     constructor (props) {
@@ -18,7 +19,8 @@ class Scoreboard extends Component {
         this.onPlayerSubmit = this.onPlayerSubmit.bind(this);
         this.onFormInput = this.onFormInput.bind(this);
         this.handleScoreUpdate = this.handleScoreUpdate.bind(this);
-        this.handleGameStart = this.handleGameStart.bind(this);
+        this.handleRemovePlayer = this.handleRemovePlayer.bind(this);
+        this.handleStartGame = this.handleStartGame.bind(this);
     }
 
     render () {
@@ -27,7 +29,8 @@ class Scoreboard extends Component {
 				<div className="scoreboard">
 					<Board
 						players={this.state.players}
-						handleScoreUpdate={this.handleScoreUpdate}
+                        handleScoreUpdate={this.handleScoreUpdate}
+                        handleRemovePlayer={this.handleRemovePlayer}
 					/>
 					<AddPlayerForm
 						onPlayerSubmit={this.onPlayerSubmit}
@@ -35,10 +38,9 @@ class Scoreboard extends Component {
 						formValue={this.state.formValue}
 					/>
 				</div>
-
-                <div className="statusBar">
+                <div className="statusbar">
                     <StatusBar
-                        handleGameStart={this.handleGameStart}
+                        handleStartGame={this.handleStartGame}
                     />
                 </div>
 				<div className="playingField">
@@ -83,10 +85,26 @@ class Scoreboard extends Component {
 
     }
 
-    handleGameStart () {
-        this.setState({
-            gameStart: true
+    handleRemovePlayer (i, event) {
+        const updatedPlayers = this.state.players.filter(function (player, index) {
+            return index !== i;
         })
+
+        this.setState({
+            players: updatedPlayers
+        })
+    }
+
+    handleStartGame () {
+        // the filthiest line in this program
+        document.querySelector('.addPlayerForm').parentElement.removeChild(document.querySelector('.addPlayerForm'));
+
+        const playerButtons = document.querySelectorAll('.removePlayerButton');
+        // remove all player buttons
+        playerButtons.forEach(function (playerButton) {
+            playerButton.parentElement.removeChild(playerButton)
+        })
+
     }
 }
 
