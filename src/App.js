@@ -43,7 +43,7 @@ class Scoreboard extends Component {
                         handleStartGame={this.handleStartGame}
                     />
                 </div>
-				<div className="playingField">
+				<div className={`playingField pf-${this.state.players.length}`}>
 					<PlayingField
                         players={this.state.players}
                         numOfPlayers={this.state.players.length}
