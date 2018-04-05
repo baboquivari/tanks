@@ -27,10 +27,10 @@
   justify-content: space-around;
   border: 1px solid red;
   height: 300px;
-  width: 500px;
+  width: 100%;
 }
 
 .gridBox {
   border: 1px solid pink;
-  flex: 0 0 32%;
+  /* flex: 0 0 32%; */
 }

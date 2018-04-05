@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import Board from './Board';
 import AddPlayerForm from './AddPlayerForm';
 import PlayingField from './PlayingField';
+import StatusBar from './StatusBar';
 
 class Scoreboard extends Component {
     constructor (props) {
@@ -10,12 +11,14 @@ class Scoreboard extends Component {
         this.state = {
             currentPlayer: '',
             players: [],
-            formValue: ''
+            formValue: '',
+            gameStart: false
         }
 
         this.onPlayerSubmit = this.onPlayerSubmit.bind(this);
         this.onFormInput = this.onFormInput.bind(this);
         this.handleScoreUpdate = this.handleScoreUpdate.bind(this);
+        this.handleGameStart = this.handleGameStart.bind(this);
     }
 
     render () {
@@ -32,9 +35,17 @@ class Scoreboard extends Component {
 						formValue={this.state.formValue}
 					/>
 				</div>
+
+                <div className="statusBar">
+                    <StatusBar
+                        handleGameStart={this.handleGameStart}
+                    />
+                </div>
 				<div className="playingField">
 					<PlayingField
-						players={this.state.players}
+                        players={this.state.players}
+                        numOfPlayers={this.state.players.length}
+                        gameStart={this.state.gameStart}
 					/>
 				</div>
 			</div>
@@ -70,6 +81,12 @@ class Scoreboard extends Component {
             players: updatedPlayers
         })
 
+    }
+
+    handleGameStart () {
+        this.setState({
+            gameStart: true
+        })
     }
 }
 
