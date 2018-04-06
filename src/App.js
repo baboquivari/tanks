@@ -3,7 +3,6 @@ import Board from './Board';
 import AddPlayerForm from './AddPlayerForm';
 import PlayingField from './PlayingField';
 import StatusBar from './StatusBar';
-import { SSL_OP_ALL } from 'constants';
 
 class Scoreboard extends Component {
     constructor (props) {
@@ -27,6 +26,21 @@ class Scoreboard extends Component {
         return (
 			<div>
 				<div className="scoreboard">
+                    <div className="header">
+                        <table className="stats">
+                            <tbody>
+                                <tr>
+                                    <td>Players:</td>
+                                    <td>{this.state.players.length}</td>
+                                </tr>
+                                <tr>
+                                    <td>Total Kills:</td>
+                                    <td>tbc</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <h1>Scoreboard</h1>
+                    </div>
 					<Board
 						players={this.state.players}
                         handleScoreUpdate={this.handleScoreUpdate}
@@ -85,7 +99,7 @@ class Scoreboard extends Component {
 
     }
 
-    handleRemovePlayer (i, event) {
+    handleRemovePlayer (i) {
         const updatedPlayers = this.state.players.filter(function (player, index) {
             return index !== i;
         })
@@ -98,12 +112,14 @@ class Scoreboard extends Component {
     handleStartGame () {
         // the filthiest line in this program
         document.querySelector('.addPlayerForm').parentElement.removeChild(document.querySelector('.addPlayerForm'));
+        document.querySelector('.startBtn').parentElement.removeChild(document.querySelector('.startBtn'));
 
         const playerButtons = document.querySelectorAll('.removePlayerButton');
         // remove all player buttons
         playerButtons.forEach(function (playerButton) {
             playerButton.parentElement.removeChild(playerButton)
-        })
+        });
+
 
     }
 }
