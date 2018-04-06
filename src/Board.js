@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React from 'react';
 
 // STATELESS COMPONENT, child of Scoreboard.js
 function Board (props) {
@@ -9,9 +9,9 @@ function Board (props) {
             <div className="playerInfo" key={i}>
                 <span>{ player.name }</span>
                 <span className="playerScoreButtons">
-                    <button onClick={handleScoreUpdate.bind(null, i, 'minus')}>-</button>
+                    <button className="minusBtn" onClick={handleScoreUpdate.bind(null, i, 'minus')}>-</button>
                     <span> Score: { players[i].score } </span>
-                    <button onClick={handleScoreUpdate.bind(null, i, 'plus')}>+</button>
+                    <button className="addBtn" onClick={handleScoreUpdate.bind(null, i, 'plus')}>+</button>
                     <button className="removePlayerButton" onClick={handleRemovePlayer.bind(null, i)}> X </button>
                 </span>
             </div>

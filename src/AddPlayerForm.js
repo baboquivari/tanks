@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React from 'react';
 
 // STATELESS COMPONENT, child of Scoreboard.js
 function AddPlayerForm (props) {
