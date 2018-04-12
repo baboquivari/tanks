@@ -12,7 +12,8 @@ class Scoreboard extends Component {
             currentPlayer: '',
             players: [],
             formValue: '',
-            gameStart: false
+            gameStart: false,
+            currentGame: {}
         }
 
         this.onPlayerSubmit = this.onPlayerSubmit.bind(this);
@@ -20,6 +21,7 @@ class Scoreboard extends Component {
         this.handleScoreUpdate = this.handleScoreUpdate.bind(this);
         this.handleRemovePlayer = this.handleRemovePlayer.bind(this);
         this.handleStartGame = this.handleStartGame.bind(this);
+        this.handleGridClick = this.handleGridClick.bind(this);
     }
 
     render () {
@@ -55,13 +57,15 @@ class Scoreboard extends Component {
                 <div className="statusbar">
                     <StatusBar
                         handleStartGame={this.handleStartGame}
+                        gameStart={this.state.gameStart}
+                        players={this.state.players}
                     />
                 </div>
 				<div className={`playingField pf-${this.state.players.length}`}>
 					<PlayingField
                         players={this.state.players}
                         numOfPlayers={this.state.players.length}
-                        gameStart={this.state.gameStart}
+                        handleGridClick={this.handleGridClick}
 					/>
 				</div>
 			</div>
@@ -110,16 +114,24 @@ class Scoreboard extends Component {
     }
 
     handleStartGame () {
-        // the filthiest line in this program
+        // the filthiest lines in this program
         document.querySelector('.addPlayerForm').parentElement.removeChild(document.querySelector('.addPlayerForm'));
         document.querySelector('.startBtn').parentElement.removeChild(document.querySelector('.startBtn'));
 
-        const playerButtons = document.querySelectorAll('.removePlayerButton');
         // remove all player buttons
+        const playerButtons = document.querySelectorAll('.removePlayerButton');
         playerButtons.forEach(function (playerButton) {
             playerButton.parentElement.removeChild(playerButton)
         });
 
+        // update state
+        this.setState({
+            gameStart: true,
+            currentPlayer: this.state.players[0]
+        })
+    }
+
+    handleGridClick (i, event) {
 
     }
 }
