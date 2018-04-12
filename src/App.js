@@ -20,7 +20,7 @@ class Scoreboard extends Component {
         this.handleScoreUpdate = this.handleScoreUpdate.bind(this);
         this.handleRemovePlayer = this.handleRemovePlayer.bind(this);
         this.handleStartGame = this.handleStartGame.bind(this);
-        this.handleGridClick = this.handleGridClick.bind(this);
+        this.handlePlayerTurn = this.handlePlayerTurn.bind(this);
     }
 
     render () {
@@ -64,7 +64,7 @@ class Scoreboard extends Component {
 					<PlayingField
                         players={this.state.players}
                         numOfPlayers={this.state.players.length}
-                        handleGridClick={this.handleGridClick}
+                        handlePlayerTurn={this.handlePlayerTurn}
                         gameStart={this.state.gameStart}
                         currentGame={this.state.currentGame}
                         currentPlayer={this.state.currentPlayer}
@@ -140,9 +140,19 @@ class Scoreboard extends Component {
         })
     }
 
-    handleGridClick (i, event) {
+    handlePlayerTurn (i) {
+        //  change currentPlayer pos in the state
+        console.log(i);
 
-    }
+        this.setState({
+            currentGame: Object.assign({}, this.state.currentGame, {
+                [this.state.currentPlayer.name]: {
+                    currentPos: i,
+                    targetTile: null
+                }
+            })
+        })
+}
 }
 
 export default Scoreboard;
