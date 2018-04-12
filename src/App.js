@@ -12,8 +12,7 @@ class Scoreboard extends Component {
             currentPlayer: '',
             players: [],
             formValue: '',
-            gameStart: false,
-            currentGame: {}
+            gameStart: false
         }
 
         this.onPlayerSubmit = this.onPlayerSubmit.bind(this);
@@ -67,6 +66,8 @@ class Scoreboard extends Component {
                         numOfPlayers={this.state.players.length}
                         handleGridClick={this.handleGridClick}
                         gameStart={this.state.gameStart}
+                        currentGame={this.state.currentGame}
+                        currentPlayer={this.state.currentPlayer}
 					/>
 				</div>
 			</div>
@@ -125,10 +126,17 @@ class Scoreboard extends Component {
             playerButton.parentElement.removeChild(playerButton)
         });
 
-        // update state
+        // update state, including adding a new CURRENTGAME prop to the state
         this.setState({
             gameStart: true,
-            currentPlayer: this.state.players[0]
+            currentPlayer: this.state.players[0],
+            currentGame: this.state.players.reduce((acc, player, i) => {
+                acc[player.name] = {
+                    currentPos: i,
+                    targetTile: null
+                }
+                return acc;
+            }, {})
         })
     }
 
