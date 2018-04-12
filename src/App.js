@@ -149,12 +149,6 @@ class Scoreboard extends Component {
     }
 
     handlePlayerTurn (i, gameStatus, event) {
-
-        console.log('bop');
-
-        // disable tank movement after confirming position
-        // if (this.state.currentGame.gameStatus === 'firing') return;
-
         //  change currentPlayer pos in the state
         this.setState({
             currentGame: Object.assign({}, this.state.currentGame, {
@@ -169,6 +163,8 @@ class Scoreboard extends Component {
     confirmPlayerMove (currentPlayer, currentGame, event) {
         // this next line is quite cool. the button which fires 'confirmPlayerMove' is a CHILD of the button which handles 'handlePlayerTurn' (in the HTML). Due to event bubbling, whenever an event is triggered a child, it also 'bubbles up' to the parent, causing the parent to fire it's handler, passing in that event. (As if itself was just triggered). This cause a problem because every time we want to confirmPlayerMove, we are also inadvertently calling the handlePlayerTurn handler above, which overwrites the state that was just set in this handler. PHEW! So, in order to stop that bubbling behaviour, we call this native DOM API method.
         event.stopPropagation();
+
+        this.state.currentGame.gameStatus === 'firing' ? document.querySelector('.nextPlayerReadyButton').style.display = "none" : document.querySelector('.nextPlayerReadyButton').style.display = "inline-block";
 
         this.setState({
             currentGame: Object.assign({}, this.state.currentGame, {

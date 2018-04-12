@@ -5,11 +5,11 @@ function StatusBar (props) {
     const { handleStartGame, gameStart, players, currentGame } = props;
     const currentPlayer = gameStart ? players[0] : null;
 
-
     return (
         <div>
             { updateStatus() }
             <button className="startBtn" onClick={handleStartGame}>Start Game</button>
+            <button className="nextPlayerReadyButton">Next Player Ready?</button>
         </div>
     )
 
