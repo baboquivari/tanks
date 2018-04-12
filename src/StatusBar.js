@@ -8,7 +8,7 @@ function StatusBar (props) {
 
     return (
         <div>
-            {currentPlayer ? `Let's go, ${currentPlayer.name}! DESTROY YOUR ENEMY` : 'STATUS BAR' }
+            {currentPlayer ? `Let's go, ${currentPlayer.name}! PICK A TILE AND DESTROY YOUR ENEMY` : 'STATUS BAR' }
             <button className="startBtn" onClick={handleStartGame}>Start Game</button>
         </div>
     )

@@ -66,6 +66,7 @@ class Scoreboard extends Component {
                         players={this.state.players}
                         numOfPlayers={this.state.players.length}
                         handleGridClick={this.handleGridClick}
+                        gameStart={this.state.gameStart}
 					/>
 				</div>
 			</div>

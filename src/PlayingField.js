@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 
 const PlayingField = (props) => {
-    const { players, handleGridClick } = props;
+    const { players, handleGridClick, gameStart } = props;
     const gridSize = Math.pow(players.length + 1, 2);
 
     // if player array is 0, return empty div
@@ -11,9 +11,11 @@ const PlayingField = (props) => {
         return (
             <div
                 className="gridBox"
+                style={{color: 'blue'}}
                 key={i}
                 onClick={handleGridClick.bind(null, i)}
-            > {i+1}
+            >
+            <p>{ gameStart && i === 0 ? 'YOUR TANK' : null  }</p>
             </div>
         )
     })
