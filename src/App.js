@@ -21,6 +21,7 @@ class Scoreboard extends Component {
         this.handleRemovePlayer = this.handleRemovePlayer.bind(this);
         this.handleStartGame = this.handleStartGame.bind(this);
         this.handlePlayerTurn = this.handlePlayerTurn.bind(this);
+        this.confirmPlayerMove = this.confirmPlayerMove.bind(this);
     }
 
     render () {
@@ -68,6 +69,7 @@ class Scoreboard extends Component {
                         gameStart={this.state.gameStart}
                         currentGame={this.state.currentGame}
                         currentPlayer={this.state.currentPlayer}
+                        confirmPlayerMove={this.confirmPlayerMove}
 					/>
 				</div>
 			</div>
@@ -130,20 +132,26 @@ class Scoreboard extends Component {
         this.setState({
             gameStart: true,
             currentPlayer: this.state.players[0],
-            currentGame: this.state.players.reduce((acc, player, i) => {
+            currentGame: Object.assign({}, this.state.currentGame, this.state.players.reduce((acc, player, i) => {
                 acc[player.name] = {
                     currentPos: i,
                     targetTile: null
                 }
                 return acc;
-            }, {})
+            }, {}),
+            {
+                gameStatus: 'positioning'
+            }
+        )
         })
     }
 
-    handlePlayerTurn (i) {
-        //  change currentPlayer pos in the state
-        console.log(i);
+    handlePlayerTurn (i, event) {
+        // we don't want the below setState to fire if confirmPlayerMove has been clicked
+        console.log(event.currentTarget);
 
+
+        //  change currentPlayer pos in the state
         this.setState({
             currentGame: Object.assign({}, this.state.currentGame, {
                 [this.state.currentPlayer.name]: {
@@ -152,7 +160,18 @@ class Scoreboard extends Component {
                 }
             })
         })
-}
+    }
+
+    confirmPlayerMove (currentPlayer, currentGame, event) {
+        // this next line is quite cool. the button which fires 'confirmPlayerMove' is a CHILD of the button which handles 'handlePlayerTurn' (in the HTML). Due to event bubbling, whenever an event is triggered a child, it also 'bubbles up' to the parent, causing the parent to fire it's handler, passing in that event. (As if itself was just triggered). This cause a problem because every time we want to confirmPlayerMove, we are also inadvertently calling the handlePlayerTurn handler above, which overwrites the state that was just set in this handler. PHEW! So, in order to stop that bubbling behaviour, we call this native DOM API method.
+        event.stopPropagation();
+
+        this.setState({
+            currentGame: Object.assign({}, this.state.currentGame, {
+                gameStatus: 'firing'
+            })
+        })
+    }
 }
 
 export default Scoreboard;
