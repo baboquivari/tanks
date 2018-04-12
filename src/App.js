@@ -12,7 +12,8 @@ class Scoreboard extends Component {
             currentPlayer: '',
             players: [],
             formValue: '',
-            gameStart: false
+            gameStart: false,
+            currentGame: {}
         }
 
         this.onPlayerSubmit = this.onPlayerSubmit.bind(this);
@@ -59,6 +60,7 @@ class Scoreboard extends Component {
                         handleStartGame={this.handleStartGame}
                         gameStart={this.state.gameStart}
                         players={this.state.players}
+                        currentGame={this.state.currentGame}
                     />
                 </div>
 				<div className={`playingField pf-${this.state.players.length}`}>
@@ -146,17 +148,19 @@ class Scoreboard extends Component {
         })
     }
 
-    handlePlayerTurn (i, event) {
-        // we don't want the below setState to fire if confirmPlayerMove has been clicked
-        console.log(event.currentTarget);
+    handlePlayerTurn (i, gameStatus, event) {
 
+        console.log('bop');
+
+        // disable tank movement after confirming position
+        // if (this.state.currentGame.gameStatus === 'firing') return;
 
         //  change currentPlayer pos in the state
         this.setState({
             currentGame: Object.assign({}, this.state.currentGame, {
                 [this.state.currentPlayer.name]: {
-                    currentPos: i,
-                    targetTile: null
+                    currentPos: gameStatus === 'positioning' ? i : this.state.currentGame[this.state.currentPlayer.name].currentPos,
+                    targetTile: gameStatus === 'positioning' ? null : i
                 }
             })
         })
