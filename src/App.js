@@ -24,6 +24,8 @@ class Scoreboard extends Component {
         this.handlePlayerTurn = this.handlePlayerTurn.bind(this);
         this.confirmPlayerAction = this.confirmPlayerAction.bind(this);
         this.getNextPlayer = this.getNextPlayer.bind(this);
+        this.setCurrentPlayerTurn = this.setCurrentPlayerTurn.bind(this);
+        this.resetTurnsTaken = this.resetTurnsTaken.bind(this);
     }
 
     render () {
@@ -63,6 +65,7 @@ class Scoreboard extends Component {
                         gameStart={this.state.gameStart}
                         players={this.state.players}
                         gameStatus={this.state.gameStatus}
+                        currentPlayer={this.state.currentPlayer}
                     />
                 </div>
 				<div className={`playingField pf-${this.state.players.length}`}>
@@ -153,30 +156,12 @@ class Scoreboard extends Component {
             player.targetTile = null
         });
 
-        console.log(updateState);
-
         this.setState({
             gameStart: updateState.gameStart,
             currentPlayer: updateState.currentPlayer,
             gameStatus: updateState.gameStatus,
             players: updateState.players
         })
-
-        // update state, including adding a new CURRENTGAME prop to the state
-        // this.setState({
-        //     gameStart: true,
-        //     currentPlayer: this.getNextPlayer(),
-        //     gameStatus: 'positioning',
-        //     currentGame: Object.assign({}, this.state.currentGame, this.state.players.reduce((acc, player, i) => {
-        //         acc[player.name] = {
-        //             currentPos: i,
-        //             targetTile: null,
-        //             turnTaken: false
-        //         }
-        //         return acc;
-        //     }, {})
-        // )
-        // })
     }
 
     getNextPlayer() {
@@ -184,9 +169,68 @@ class Scoreboard extends Component {
 
         for (const player of players) {
             if (!player.turnTaken) {
-                return player.id;
+                return player;
             }
         }
+
+        this.resetTurnsTaken();
+
+        return players[0];
+    }
+
+    handlePlayerTurn (i, gameStatus, event) {
+        //  change currentPlayer pos in the state
+        event.stopPropagation();
+
+        let currentPlayer = this.state.currentPlayer;
+
+        currentPlayer.currentPos = gameStatus === 'positioning' ? i : currentPlayer.currentPos;
+        currentPlayer.targetTile = gameStatus === 'positioning' ? null : i;
+
+        this.setState({
+            currentPlayer: currentPlayer
+        })
+    }
+
+    confirmPlayerAction (currentPlayer, players, gameStatus, event) {
+        // this next line is quite cool. the button which fires 'confirmPlayerMove' is a CHILD of the button which handles 'handlePlayerTurn' (in the HTML). Due to event bubbling, whenever an event is triggered a child, it also 'bubbles up' to the parent, causing the parent to fire it's handler, passing in that event. (As if itself was just triggered). This cause a problem because every time we want to confirmPlayerMove, we are also inadvertently calling the handlePlayerTurn handler above, which overwrites the state that was just set in this handler. PHEW! So, in order to stop that bubbling behaviour, we call this native DOM API method.
+        event.stopPropagation();
+
+        if(gameStatus === 'positioning'){
+            this.setState({ gameStatus: 'firing' });
+        } else {
+            this.setCurrentPlayerTurn(true);
+            this.setState({ 
+                gameStatus: 'positioning',
+                currentPlayer: currentPlayer,
+                currentPlayer: this.getNextPlayer(true)
+            });
+
+        }
+
+    }
+
+    setCurrentPlayerTurn(turnTaken) {
+        // set the current players turn taken to true
+        // change current player to next player in array
+        let currentPlayer = this.state.currentPlayer;
+        let players = this.state.players;
+
+        if(turnTaken){
+            currentPlayer.turnTaken = true;
+        } else {
+            // end of round so reset players
+            this.resetTurnsTaken();
+        }
+
+        this.setState({
+            currentPlayer: this.getNextPlayer()
+        })
+    }
+
+    resetTurnsTaken() {
+        // resets all turns taken to false
+        let players = this.state.players;
 
         for (let player of players) {
             player.turnTaken = false;
@@ -195,44 +239,6 @@ class Scoreboard extends Component {
         this.setState({
             players: players
         })
-
-        return players[0];
-    }
-
-    handlePlayerTurn (i, gameStatus, event) {
-        //  change currentPlayer pos in the state
-        this.setState({
-            currentGame: Object.assign({}, this.state.currentGame, {
-                [this.state.currentPlayer.name]: {
-                    currentPos: gameStatus === 'positioning' ? i : this.state.currentGame[this.state.currentPlayer.name].currentPos,
-                    targetTile: gameStatus === 'positioning' ? null : i
-                }
-            })
-        })
-    }
-
-    confirmPlayerAction (currentPlayer, currentGame, event) {
-        // this next line is quite cool. the button which fires 'confirmPlayerMove' is a CHILD of the button which handles 'handlePlayerTurn' (in the HTML). Due to event bubbling, whenever an event is triggered a child, it also 'bubbles up' to the parent, causing the parent to fire it's handler, passing in that event. (As if itself was just triggered). This cause a problem because every time we want to confirmPlayerMove, we are also inadvertently calling the handlePlayerTurn handler above, which overwrites the state that was just set in this handler. PHEW! So, in order to stop that bubbling behaviour, we call this native DOM API method.
-        event.stopPropagation();
-
-        if(this.state.gameStatus === 'positioning'){
-            document.querySelector('.nextPlayerReadyButton').style.display = "none";
-
-            this.setState({
-                currentGame: Object.assign({}, this.state, {
-                    gameStatus: 'firing'
-                })
-            });
-        } else {
-            this.setState({
-                currentGame: Object.assign({}, this.state, {
-                    gameStatus: 'positioning',
-                })
-            });
-
-            document.querySelector('.nextPlayerReadyButton').style.display = "inline-block";
-        }
-
     }
 }
 
