@@ -137,3 +137,9 @@ body {
 .pf-4{
   grid-template-columns: repeat(5, 1fr);
 }
+
+/* STATUS BAR */
+
+.nextPlayerReadyButton {
+  display: none;
+}
