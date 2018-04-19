@@ -209,10 +209,11 @@ class Scoreboard extends Component {
         }
 
         function reset (prevState) {
-            // loop through and reset all players 'takenTurn' properties to false, then return 1st player in array to reset the round
+            // loop through and reset all players 'takenTurn' and 'targetTile' properties to false and null respectively, then return 1st player in array to reset the round
             Object.keys(prevState.currentGame).forEach(key => {
                 if (key !== 'gameStatus') {
                     prevState.currentGame[key].takenTurn = false;
+                    prevState.currentGame[key].targetTile = null;
                 }
             })
 
