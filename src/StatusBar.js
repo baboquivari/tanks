@@ -2,7 +2,7 @@ import React from 'react';
 
 // STATELESS COMPONENT, child of Scoreboard.js
 function StatusBar (props) {
-    const { handleStartGame, gameStart, players, currentGame } = props;
+    const { handleStartGame, gameStart, players, gameStatus } = props;
     const currentPlayer = gameStart ? players[0] : null;
 
     return (
@@ -14,7 +14,7 @@ function StatusBar (props) {
     )
 
     function updateStatus () {
-        switch (currentGame.gameStatus) {
+        switch (gameStatus) {
             case 'positioning':
                 return `Let's go, ${currentPlayer.name}! PICK A TILE TO MOVE TO`;
             case 'firing':

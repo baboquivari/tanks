@@ -9,11 +9,11 @@ class Scoreboard extends Component {
         super(props);
 
         this.state = {
-            currentPlayer: '',
+            currentPlayer: null,
             players: [],
             formValue: '',
             gameStart: false,
-            currentGame: {}
+            gameStatus: ''
         }
 
         this.onPlayerSubmit = this.onPlayerSubmit.bind(this);
@@ -23,6 +23,7 @@ class Scoreboard extends Component {
         this.handleStartGame = this.handleStartGame.bind(this);
         this.handlePlayerTurn = this.handlePlayerTurn.bind(this);
         this.confirmPlayerAction = this.confirmPlayerAction.bind(this);
+        this.getNextPlayer = this.getNextPlayer.bind(this);
     }
 
     render () {
@@ -46,6 +47,7 @@ class Scoreboard extends Component {
                     </div>
 					<Board
 						players={this.state.players}
+                        currentPlayer={this.state.players}
                         handleScoreUpdate={this.handleScoreUpdate}
                         handleRemovePlayer={this.handleRemovePlayer}
 					/>
@@ -60,16 +62,15 @@ class Scoreboard extends Component {
                         handleStartGame={this.handleStartGame}
                         gameStart={this.state.gameStart}
                         players={this.state.players}
-                        currentGame={this.state.currentGame}
+                        gameStatus={this.state.gameStatus}
                     />
                 </div>
 				<div className={`playingField pf-${this.state.players.length}`}>
 					<PlayingField
                         players={this.state.players}
-                        numOfPlayers={this.state.players.length}
                         handlePlayerTurn={this.handlePlayerTurn}
                         gameStart={this.state.gameStart}
-                        currentGame={this.state.currentGame}
+                        gameStatus={this.state.gameStatus}
                         currentPlayer={this.state.currentPlayer}
                         confirmPlayerAction={this.confirmPlayerAction}
 					/>
@@ -88,14 +89,26 @@ class Scoreboard extends Component {
         // this prevents page refresh, which is what the native HTML Button Element does by default
         event.preventDefault();
 
+        let players = this.state.players;
+
+        // players[(Math.random() * 100000).toFixed(0)].push({
+        //     name: this.state.formValue,
+        //     score: 0,
+        //     turnTaken: false
+        // });
+
+        players.push({
+            id: (Math.random() * 100000).toFixed(0),
+            name: this.state.formValue,
+            score: 0,
+            turnTaken: true
+        });
+
         this.setState({
-            players: this.state.players.concat({
-                name: this.state.formValue,
-                score: 0,
-                id: (Math.random() * 100000).toFixed(0)
-            }),
+            players: players,
             formValue: ''
         })
+
     }
 
     handleScoreUpdate (playerArrID, buttonType) {
@@ -130,22 +143,60 @@ class Scoreboard extends Component {
             playerButton.parentElement.removeChild(playerButton)
         });
 
-        // update state, including adding a new CURRENTGAME prop to the state
+        let updateState = this.state;
+
+        updateState.gameStart = true;
+        updateState.currentPlayer = this.getNextPlayer();
+        updateState.gameStatus = 'positioning';
+        updateState.players.map((player, i) => {
+            player.currentPos = i,
+            player.targetTile = null
+        });
+
+        console.log(updateState);
+
         this.setState({
-            gameStart: true,
-            currentPlayer: this.state.players[0],
-            currentGame: Object.assign({}, this.state.currentGame, this.state.players.reduce((acc, player, i) => {
-                acc[player.name] = {
-                    currentPos: i,
-                    targetTile: null
-                }
-                return acc;
-            }, {}),
-            {
-                gameStatus: 'positioning'
-            }
-        )
+            gameStart: updateState.gameStart,
+            currentPlayer: updateState.currentPlayer,
+            gameStatus: updateState.gameStatus,
+            players: updateState.players
         })
+
+        // update state, including adding a new CURRENTGAME prop to the state
+        // this.setState({
+        //     gameStart: true,
+        //     currentPlayer: this.getNextPlayer(),
+        //     gameStatus: 'positioning',
+        //     currentGame: Object.assign({}, this.state.currentGame, this.state.players.reduce((acc, player, i) => {
+        //         acc[player.name] = {
+        //             currentPos: i,
+        //             targetTile: null,
+        //             turnTaken: false
+        //         }
+        //         return acc;
+        //     }, {})
+        // )
+        // })
+    }
+
+    getNextPlayer() {
+        const players = this.state.players;
+
+        for (const player of players) {
+            if (!player.turnTaken) {
+                return player.id;
+            }
+        }
+
+        for (let player of players) {
+            player.turnTaken = false;
+        }
+
+        this.setState({
+            players: players
+        })
+
+        return players[0];
     }
 
     handlePlayerTurn (i, gameStatus, event) {
@@ -164,17 +215,17 @@ class Scoreboard extends Component {
         // this next line is quite cool. the button which fires 'confirmPlayerMove' is a CHILD of the button which handles 'handlePlayerTurn' (in the HTML). Due to event bubbling, whenever an event is triggered a child, it also 'bubbles up' to the parent, causing the parent to fire it's handler, passing in that event. (As if itself was just triggered). This cause a problem because every time we want to confirmPlayerMove, we are also inadvertently calling the handlePlayerTurn handler above, which overwrites the state that was just set in this handler. PHEW! So, in order to stop that bubbling behaviour, we call this native DOM API method.
         event.stopPropagation();
 
-        if(this.state.currentGame.gameStatus === 'positioning'){
+        if(this.state.gameStatus === 'positioning'){
             document.querySelector('.nextPlayerReadyButton').style.display = "none";
 
             this.setState({
-                currentGame: Object.assign({}, this.state.currentGame, {
+                currentGame: Object.assign({}, this.state, {
                     gameStatus: 'firing'
                 })
             });
         } else {
             this.setState({
-                currentGame: Object.assign({}, this.state.currentGame, {
+                currentGame: Object.assign({}, this.state, {
                     gameStatus: 'positioning',
                 })
             });
