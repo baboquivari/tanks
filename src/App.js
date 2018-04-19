@@ -136,8 +136,9 @@ class Scoreboard extends Component {
             currentPlayer: this.state.players[0],
             currentGame: Object.assign({}, this.state.currentGame, this.state.players.reduce((acc, player, i) => {
                 acc[player.name] = {
-                    currentPos: i,
-                    targetTile: null
+                    currentPos: Math.round(Math.random() * Math.pow(this.state.players.length + 1, 2)),
+                    targetTile: null,
+                    takenTurn: false
                 }
                 return acc;
             }, {}),
@@ -154,34 +155,48 @@ class Scoreboard extends Component {
             currentGame: Object.assign({}, this.state.currentGame, {
                 [this.state.currentPlayer.name]: {
                     currentPos: gameStatus === 'positioning' ? i : this.state.currentGame[this.state.currentPlayer.name].currentPos,
-                    targetTile: gameStatus === 'positioning' ? null : i
+                    targetTile: gameStatus === 'positioning' ? null : i,
+                    takenTurn: this.state.currentGame[this.state.currentPlayer.name].takenTurn
                 }
             })
         })
     }
 
     confirmPlayerAction (currentPlayer, currentGame, event) {
-        // this next line is quite cool. the button which fires 'confirmPlayerMove' is a CHILD of the button which handles 'handlePlayerTurn' (in the HTML). Due to event bubbling, whenever an event is triggered a child, it also 'bubbles up' to the parent, causing the parent to fire it's handler, passing in that event. (As if itself was just triggered). This cause a problem because every time we want to confirmPlayerMove, we are also inadvertently calling the handlePlayerTurn handler above, which overwrites the state that was just set in this handler. PHEW! So, in order to stop that bubbling behaviour, we call this native DOM API method.
+        // this next line is quite cool. the button which fires 'confirmPlayerMove' is a CHILD of the button which handles 'handlePlayerTurn' (in the HTML). Due to event bubbling, whenever an event is triggered on a child, it also 'bubbles up' to the parent, causing the parent to fire it's handler, passing in that event. (As if itself was just triggered). This cause a problem because every time we want to confirmPlayerMove, we are also inadvertently calling the handlePlayerTurn handler above, which overwrites the state that was just set in this handler. PHEW! So, in order to stop that bubbling behaviour, we call this native DOM API method.
         event.stopPropagation();
 
-        if(this.state.currentGame.gameStatus === 'positioning'){
+        if(currentGame.gameStatus === 'positioning'){
             document.querySelector('.nextPlayerReadyButton').style.display = "none";
 
             this.setState({
-                currentGame: Object.assign({}, this.state.currentGame, {
+                currentGame: Object.assign({}, currentGame, {
                     gameStatus: 'firing'
                 })
             });
         } else {
             this.setState({
-                currentGame: Object.assign({}, this.state.currentGame, {
+                currentGame: Object.assign({}, currentGame, {
                     gameStatus: 'positioning',
-                })
+                    [currentPlayer]: Object.assign({}, currentGame[currentPlayer], {
+                        takenTurn: !currentGame[currentPlayer.takenTurn]
+                    })
+                }),
+                currentPlayer: Object.assign({}, this.state.currentPlayer, findNextPlayer(this, currentPlayer))
             });
 
             document.querySelector('.nextPlayerReadyButton').style.display = "inline-block";
         }
 
+        function findNextPlayer (context, currentPlayer) {
+            // loop through this.state.players ARRAY
+            // check each player's TAKENTURN property. Stop and return the first one that is set to false.
+            const playersArray = context.state.players;
+
+            for (const player of playersArray) {
+                if (!currentGame[player.name].takenTurn) return player;
+            }
+        }
     }
 }
 
