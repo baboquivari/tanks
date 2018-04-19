@@ -61,6 +61,7 @@ class Scoreboard extends Component {
                         gameStart={this.state.gameStart}
                         players={this.state.players}
                         currentGame={this.state.currentGame}
+                        currentPlayer={this.state.currentPlayer}
                     />
                 </div>
 				<div className={`playingField pf-${this.state.players.length}`}>
@@ -166,8 +167,6 @@ class Scoreboard extends Component {
         // this next line is quite cool. the button which fires 'confirmPlayerMove' is a CHILD of the button which handles 'handlePlayerTurn' (in the HTML). Due to event bubbling, whenever an event is triggered on a child, it also 'bubbles up' to the parent, causing the parent to fire it's handler, passing in that event. (As if itself was just triggered). This cause a problem because every time we want to confirmPlayerMove, we are also inadvertently calling the handlePlayerTurn handler above, which overwrites the state that was just set in this handler. PHEW! So, in order to stop that bubbling behaviour, we call this native DOM API method.
         event.stopPropagation();
 
-        console.log(currentGame);
-
         if (currentGame.gameStatus === 'positioning') {
             document.querySelector('.nextPlayerReadyButton').style.display = "none";
 
@@ -178,6 +177,10 @@ class Scoreboard extends Component {
 
         } else {
 
+            // !!! Important! We need to talk about setState. I've only recently learned this, but it's solved a lot of headaches. setState is actually an asynchronous function, it doesn't update the state instantly, it kind of does it in 'batches'. The problem with this arises when you try to run setState more than once in the same function, like we are doing here (the reason I'm doing so is because the 2nd setState depends on the takenTurn value update in the 1st update). The 2nd update only has access to the 'old' state, ie: the 1st update hasn't really come into effect yet. Obviously, this is a problem, so how do we fix it?
+            // SOLUTION: We've been using the setState function one kind of way up until now, by just passing it an object. But, if we pass setState a function with it's parameters set to 'prevState' and 'props' (props is optional), you have more control over the state at any given time. Basically, you have access to the newly updated state via the 'prevState' parameter, which you can then use to update state accordingly. So, all that's different about the syntax is that we pass setState a function (here I'm using an arrow function to be cool) and then you have that function RETURN an object. Hang on, so where's the RETURN statement, you say? Well noticed. With arrow functions you can return an object literal without the RETURN keyword if you just write the object right after the '=>' and then WRAP that entire object in normal parentheses.
+
+            // 1st state update
             this.setState((prevState) => ({
                 currentGame: Object.assign({}, currentGame, {
                     gameStatus: 'positioning',
@@ -187,28 +190,33 @@ class Scoreboard extends Component {
                 })
             }))
 
+            // 2nd state update
             this.setState((prevState) => ({
-                currentPlayer: findNextPlayer.call(this, prevState)
+                currentPlayer: findNextPlayer.call(this, prevState) ? findNextPlayer.call(this, prevState) : reset(prevState)
             }))
 
             document.querySelector('.nextPlayerReadyButton').style.display = "inline-block";
         }
 
         function findNextPlayer (prevState) {
-            // loop through this.state.players ARRAY
-            // check each player's TAKENTURN property. Stop and return the first one that is set to false.
             const playersArray = this.state.players;
-
-            // you can see the asynchronicity at play here
-            console.log(this.state);
-            console.log(prevState);
 
             for (let i = 0; i < playersArray.length; i++) {
                 if (!prevState.currentGame[playersArray[i].name].takenTurn) {
-                    console.log(playersArray[i]);
                     return playersArray[i];
                 }
             }
+        }
+
+        function reset (prevState) {
+            // loop through and reset all players 'takenTurn' properties to false, then return 1st player in array to reset the round
+            Object.keys(prevState.currentGame).forEach(key => {
+                if (key !== 'gameStatus') {
+                    prevState.currentGame[key].takenTurn = false;
+                }
+            })
+
+            return prevState.players[0]
         }
     }
 }

@@ -2,8 +2,7 @@ import React from 'react';
 
 // STATELESS COMPONENT, child of Scoreboard.js
 function StatusBar (props) {
-    const { handleStartGame, gameStart, players, currentGame } = props;
-    const currentPlayer = gameStart ? players[0] : null;
+    const { handleStartGame, gameStart, players, currentGame, currentPlayer } = props;
 
     return (
         <div>
