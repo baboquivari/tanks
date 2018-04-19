@@ -22,7 +22,7 @@ class Scoreboard extends Component {
         this.handleRemovePlayer = this.handleRemovePlayer.bind(this);
         this.handleStartGame = this.handleStartGame.bind(this);
         this.handlePlayerTurn = this.handlePlayerTurn.bind(this);
-        this.confirmPlayerMove = this.confirmPlayerMove.bind(this);
+        this.confirmPlayerAction = this.confirmPlayerAction.bind(this);
     }
 
     render () {
@@ -71,7 +71,7 @@ class Scoreboard extends Component {
                         gameStart={this.state.gameStart}
                         currentGame={this.state.currentGame}
                         currentPlayer={this.state.currentPlayer}
-                        confirmPlayerMove={this.confirmPlayerMove}
+                        confirmPlayerAction={this.confirmPlayerAction}
 					/>
 				</div>
 			</div>
@@ -160,17 +160,28 @@ class Scoreboard extends Component {
         })
     }
 
-    confirmPlayerMove (currentPlayer, currentGame, event) {
+    confirmPlayerAction (currentPlayer, currentGame, event) {
         // this next line is quite cool. the button which fires 'confirmPlayerMove' is a CHILD of the button which handles 'handlePlayerTurn' (in the HTML). Due to event bubbling, whenever an event is triggered a child, it also 'bubbles up' to the parent, causing the parent to fire it's handler, passing in that event. (As if itself was just triggered). This cause a problem because every time we want to confirmPlayerMove, we are also inadvertently calling the handlePlayerTurn handler above, which overwrites the state that was just set in this handler. PHEW! So, in order to stop that bubbling behaviour, we call this native DOM API method.
         event.stopPropagation();
 
-        this.state.currentGame.gameStatus === 'firing' ? document.querySelector('.nextPlayerReadyButton').style.display = "none" : document.querySelector('.nextPlayerReadyButton').style.display = "inline-block";
+        if(this.state.currentGame.gameStatus === 'positioning'){
+            document.querySelector('.nextPlayerReadyButton').style.display = "none";
 
-        this.setState({
-            currentGame: Object.assign({}, this.state.currentGame, {
-                gameStatus: 'firing'
-            })
-        })
+            this.setState({
+                currentGame: Object.assign({}, this.state.currentGame, {
+                    gameStatus: 'firing'
+                })
+            });
+        } else {
+            this.setState({
+                currentGame: Object.assign({}, this.state.currentGame, {
+                    gameStatus: 'positioning',
+                })
+            });
+
+            document.querySelector('.nextPlayerReadyButton').style.display = "inline-block";
+        }
+
     }
 }
 

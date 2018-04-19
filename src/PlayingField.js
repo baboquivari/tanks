@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 
 const PlayingField = (props) => {
-    const { players, handlePlayerTurn, gameStart, currentGame, currentPlayer, confirmPlayerMove } = props;
+    const { players, handlePlayerTurn, gameStart, currentGame, currentPlayer, confirmPlayerAction } = props;
     const gridSize = Math.pow(players.length + 1, 2);
 
     // if player array is 0, return empty div
@@ -21,9 +21,14 @@ const PlayingField = (props) => {
                 {/* render targetTile locations */}
                 <p>{ gameStart && currentGame[currentPlayer.name].targetTile === i ? 'YOUR SHOT' : null  }</p>
 
-                <button onClick={confirmPlayerMove.bind(null, currentPlayer.name, currentGame)}>
-                    { gameStart && currentGame[currentPlayer.name].currentPos === i && currentGame.gameStatus !== 'firing' ? 'CONFIRM' : null  }
+                <button onClick={confirmPlayerAction.bind(null, currentPlayer.name, currentGame)}>
+                    { gameStart && currentGame[currentPlayer.name].currentPos === i && currentGame.gameStatus === 'positioning' ? 'CONFIRM' : null  }
                 </button>
+
+                <button onClick={confirmPlayerAction.bind(null, currentPlayer.name, currentGame)}>
+                    { gameStart && currentGame[currentPlayer.name].targetTile === i && currentGame.gameStatus === 'firing' ? 'CONFIRM' : null  }
+                </button>
+
             </div>
         )
     })
