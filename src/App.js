@@ -166,35 +166,48 @@ class Scoreboard extends Component {
         // this next line is quite cool. the button which fires 'confirmPlayerMove' is a CHILD of the button which handles 'handlePlayerTurn' (in the HTML). Due to event bubbling, whenever an event is triggered on a child, it also 'bubbles up' to the parent, causing the parent to fire it's handler, passing in that event. (As if itself was just triggered). This cause a problem because every time we want to confirmPlayerMove, we are also inadvertently calling the handlePlayerTurn handler above, which overwrites the state that was just set in this handler. PHEW! So, in order to stop that bubbling behaviour, we call this native DOM API method.
         event.stopPropagation();
 
-        if(currentGame.gameStatus === 'positioning'){
+        console.log(currentGame);
+
+        if (currentGame.gameStatus === 'positioning') {
             document.querySelector('.nextPlayerReadyButton').style.display = "none";
 
-            this.setState({
+            this.setState(() => ({
                 currentGame: Object.assign({}, currentGame, {
                     gameStatus: 'firing'
-                })
-            });
+            })}))
+
         } else {
-            this.setState({
+
+            this.setState((prevState) => ({
                 currentGame: Object.assign({}, currentGame, {
                     gameStatus: 'positioning',
                     [currentPlayer]: Object.assign({}, currentGame[currentPlayer], {
-                        takenTurn: !currentGame[currentPlayer.takenTurn]
+                        takenTurn: !currentGame[currentPlayer].takenTurn
                     })
-                }),
-                currentPlayer: Object.assign({}, this.state.currentPlayer, findNextPlayer(this, currentPlayer))
-            });
+                })
+            }))
+
+            this.setState((prevState) => ({
+                currentPlayer: findNextPlayer.call(this, prevState)
+            }))
 
             document.querySelector('.nextPlayerReadyButton').style.display = "inline-block";
         }
 
-        function findNextPlayer (context, currentPlayer) {
+        function findNextPlayer (prevState) {
             // loop through this.state.players ARRAY
             // check each player's TAKENTURN property. Stop and return the first one that is set to false.
-            const playersArray = context.state.players;
+            const playersArray = this.state.players;
 
-            for (const player of playersArray) {
-                if (!currentGame[player.name].takenTurn) return player;
+            // you can see the asynchronicity at play here
+            console.log(this.state);
+            console.log(prevState);
+
+            for (let i = 0; i < playersArray.length; i++) {
+                if (!prevState.currentGame[playersArray[i].name].takenTurn) {
+                    console.log(playersArray[i]);
+                    return playersArray[i];
+                }
             }
         }
     }
