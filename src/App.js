@@ -26,6 +26,8 @@ class Scoreboard extends Component {
         this.getNextPlayer = this.getNextPlayer.bind(this);
         this.setCurrentPlayerTurn = this.setCurrentPlayerTurn.bind(this);
         this.resetTurnsTaken = this.resetTurnsTaken.bind(this);
+        this.checkPlayerHits = this.checkPlayerHits.bind(this);
+        this.endOfRound = this.endOfRound.bind(this);
     }
 
     render () {
@@ -104,7 +106,7 @@ class Scoreboard extends Component {
             id: (Math.random() * 100000).toFixed(0),
             name: this.state.formValue,
             score: 0,
-            turnTaken: true
+            turnTaken: false
         });
 
         this.setState({
@@ -173,7 +175,7 @@ class Scoreboard extends Component {
             }
         }
 
-        this.resetTurnsTaken();
+        this.setCurrentPlayerTurn(false);
 
         return players[0];
     }
@@ -202,7 +204,6 @@ class Scoreboard extends Component {
             this.setCurrentPlayerTurn(true);
             this.setState({
                 gameStatus: 'positioning',
-                currentPlayer: currentPlayer,
                 currentPlayer: this.getNextPlayer(true)
             });
 
@@ -217,34 +218,18 @@ class Scoreboard extends Component {
                 }
             }
         }
-
-
-        // TODO: So by the time we get here, all players' targetTiles are NULL, which is fucking with my ability to see who's actually been hit. Find out where they're being set to NULL.
-        function reset (prevState) {
-            // loop through and reset all players 'takenTurn' and 'targetTile' properties to false and null respectively, then return 1st player in array to reset the round
-            Object.keys(prevState.currentGame).forEach(key => {
-                if (key !== 'gameStatus') {
-                    console.log(prevState.currentGame);
-                    prevState.currentGame[key].takenTurn = false;
-                    prevState.currentGame[key].targetTile = null;
-                }
-            })
-
-            return prevState.players[0]
-        }
     }
 
     setCurrentPlayerTurn(turnTaken) {
         // set the current players turn taken to true
         // change current player to next player in array
         let currentPlayer = this.state.currentPlayer;
-        let players = this.state.players;
 
         if(turnTaken){
             currentPlayer.turnTaken = true;
         } else {
             // end of round so reset players
-            this.resetTurnsTaken();
+            this.endOfRound();
         }
 
         this.setState({
@@ -252,12 +237,13 @@ class Scoreboard extends Component {
         })
     }
 
-    resetTurnsTaken() {
+    resetTurnsTaken () {
         // resets all turns taken to false
         let players = this.state.players;
 
         for (let player of players) {
             player.turnTaken = false;
+            player.targetTile = null;
         }
 
         this.setState({
@@ -265,35 +251,13 @@ class Scoreboard extends Component {
         })
     }
 
-    setCurrentPlayerTurn(turnTaken) {
-        // set the current players turn taken to true
-        // change current player to next player in array
-        let currentPlayer = this.state.currentPlayer;
-        let players = this.state.players;
+    checkPlayerHits () {
 
-        if(turnTaken){
-            currentPlayer.turnTaken = true;
-        } else {
-            // end of round so reset players
-            this.resetTurnsTaken();
-        }
-
-        this.setState({
-            currentPlayer: this.getNextPlayer()
-        })
     }
 
-    resetTurnsTaken() {
-        // resets all turns taken to false
-        let players = this.state.players;
-
-        for (let player of players) {
-            player.turnTaken = false;
-        }
-
-        this.setState({
-            players: players
-        })
+    endOfRound () {
+        this.checkPlayerHits()
+        this.resetTurnsTaken()
     }
 }
 
