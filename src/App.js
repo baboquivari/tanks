@@ -264,6 +264,37 @@ class Scoreboard extends Component {
             players: players
         })
     }
+
+    setCurrentPlayerTurn(turnTaken) {
+        // set the current players turn taken to true
+        // change current player to next player in array
+        let currentPlayer = this.state.currentPlayer;
+        let players = this.state.players;
+
+        if(turnTaken){
+            currentPlayer.turnTaken = true;
+        } else {
+            // end of round so reset players
+            this.resetTurnsTaken();
+        }
+
+        this.setState({
+            currentPlayer: this.getNextPlayer()
+        })
+    }
+
+    resetTurnsTaken() {
+        // resets all turns taken to false
+        let players = this.state.players;
+
+        for (let player of players) {
+            player.turnTaken = false;
+        }
+
+        this.setState({
+            players: players
+        })
+    }
 }
 
 export default Scoreboard;
