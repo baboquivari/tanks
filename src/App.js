@@ -9,11 +9,11 @@ class Scoreboard extends Component {
         super(props);
 
         this.state = {
-            currentPlayer: '',
+            currentPlayer: null,
             players: [],
             formValue: '',
             gameStart: false,
-            currentGame: {}
+            gameStatus: ''
         }
 
         this.onPlayerSubmit = this.onPlayerSubmit.bind(this);
@@ -23,6 +23,9 @@ class Scoreboard extends Component {
         this.handleStartGame = this.handleStartGame.bind(this);
         this.handlePlayerTurn = this.handlePlayerTurn.bind(this);
         this.confirmPlayerAction = this.confirmPlayerAction.bind(this);
+        this.getNextPlayer = this.getNextPlayer.bind(this);
+        this.setCurrentPlayerTurn = this.setCurrentPlayerTurn.bind(this);
+        this.resetTurnsTaken = this.resetTurnsTaken.bind(this);
     }
 
     render () {
@@ -46,6 +49,7 @@ class Scoreboard extends Component {
                     </div>
 					<Board
 						players={this.state.players}
+                        currentPlayer={this.state.players}
                         handleScoreUpdate={this.handleScoreUpdate}
                         handleRemovePlayer={this.handleRemovePlayer}
 					/>
@@ -60,17 +64,16 @@ class Scoreboard extends Component {
                         handleStartGame={this.handleStartGame}
                         gameStart={this.state.gameStart}
                         players={this.state.players}
-                        currentGame={this.state.currentGame}
+                        gameStatus={this.state.gameStatus}
                         currentPlayer={this.state.currentPlayer}
                     />
                 </div>
 				<div className={`playingField pf-${this.state.players.length}`}>
 					<PlayingField
                         players={this.state.players}
-                        numOfPlayers={this.state.players.length}
                         handlePlayerTurn={this.handlePlayerTurn}
                         gameStart={this.state.gameStart}
-                        currentGame={this.state.currentGame}
+                        gameStatus={this.state.gameStatus}
                         currentPlayer={this.state.currentPlayer}
                         confirmPlayerAction={this.confirmPlayerAction}
 					/>
@@ -89,14 +92,26 @@ class Scoreboard extends Component {
         // this prevents page refresh, which is what the native HTML Button Element does by default
         event.preventDefault();
 
+        let players = this.state.players;
+
+        // players[(Math.random() * 100000).toFixed(0)].push({
+        //     name: this.state.formValue,
+        //     score: 0,
+        //     turnTaken: false
+        // });
+
+        players.push({
+            id: (Math.random() * 100000).toFixed(0),
+            name: this.state.formValue,
+            score: 0,
+            turnTaken: true
+        });
+
         this.setState({
-            players: this.state.players.concat({
-                name: this.state.formValue,
-                score: 0,
-                id: (Math.random() * 100000).toFixed(0)
-            }),
+            players: players,
             formValue: ''
         })
+
     }
 
     handleScoreUpdate (playerArrID, buttonType) {
@@ -131,83 +146,65 @@ class Scoreboard extends Component {
             playerButton.parentElement.removeChild(playerButton)
         });
 
-        // update state, including adding a new CURRENTGAME prop to the state
+        let updateState = this.state;
+
+        updateState.gameStart = true;
+        updateState.currentPlayer = this.getNextPlayer();
+        updateState.gameStatus = 'positioning';
+        updateState.players.map((player, i) => {
+            player.currentPos = i,
+            player.targetTile = null
+        });
+
         this.setState({
-            gameStart: true,
-            currentPlayer: this.state.players[0],
-            currentGame: Object.assign({}, this.state.currentGame, this.state.players.reduce((acc, player, i) => {
-                acc[player.name] = {
-                    currentPos: Math.round(Math.random() * Math.pow(this.state.players.length + 1, 2)),
-                    targetTile: null,
-                    takenTurn: false
-                }
-                return acc;
-            }, {}),
-            {
-                gameStatus: 'positioning'
-            }
-        )
+            gameStart: updateState.gameStart,
+            currentPlayer: updateState.currentPlayer,
+            gameStatus: updateState.gameStatus,
+            players: updateState.players
         })
+    }
+
+    getNextPlayer() {
+        const players = this.state.players;
+
+        for (const player of players) {
+            if (!player.turnTaken) {
+                return player;
+            }
+        }
+
+        this.resetTurnsTaken();
+
+        return players[0];
     }
 
     handlePlayerTurn (i, gameStatus, event) {
         //  change currentPlayer pos in the state
+        event.stopPropagation();
+
+        let currentPlayer = this.state.currentPlayer;
+
+        currentPlayer.currentPos = gameStatus === 'positioning' ? i : currentPlayer.currentPos;
+        currentPlayer.targetTile = gameStatus === 'positioning' ? null : i;
+
         this.setState({
-            currentGame: Object.assign({}, this.state.currentGame, {
-                [this.state.currentPlayer.name]: {
-                    currentPos: gameStatus === 'positioning' ? i : this.state.currentGame[this.state.currentPlayer.name].currentPos,
-                    targetTile: gameStatus === 'positioning' ? null : i,
-                    takenTurn: this.state.currentGame[this.state.currentPlayer.name].takenTurn
-                }
-            })
+            currentPlayer: currentPlayer
         })
     }
 
-    confirmPlayerAction (currentPlayer, currentGame, event) {
-        // this next line is quite cool. the button which fires 'confirmPlayerMove' is a CHILD of the button which handles 'handlePlayerTurn' (in the HTML). Due to event bubbling, whenever an event is triggered on a child, it also 'bubbles up' to the parent, causing the parent to fire it's handler, passing in that event. (As if itself was just triggered). This cause a problem because every time we want to confirmPlayerMove, we are also inadvertently calling the handlePlayerTurn handler above, which overwrites the state that was just set in this handler. PHEW! So, in order to stop that bubbling behaviour, we call this native DOM API method.
+    confirmPlayerAction (currentPlayer, players, gameStatus, event) {
+        // this next line is quite cool. the button which fires 'confirmPlayerMove' is a CHILD of the button which handles 'handlePlayerTurn' (in the HTML). Due to event bubbling, whenever an event is triggered a child, it also 'bubbles up' to the parent, causing the parent to fire it's handler, passing in that event. (As if itself was just triggered). This cause a problem because every time we want to confirmPlayerMove, we are also inadvertently calling the handlePlayerTurn handler above, which overwrites the state that was just set in this handler. PHEW! So, in order to stop that bubbling behaviour, we call this native DOM API method.
         event.stopPropagation();
 
-        if (currentGame.gameStatus === 'positioning') {
-            document.querySelector('.nextPlayerReadyButton').style.display = "none";
-
-            this.setState(() => ({
-                currentGame: Object.assign({}, currentGame, {
-                    gameStatus: 'firing'
-                }
-            )}))
+        if(gameStatus === 'positioning'){
+            this.setState({ gameStatus: 'firing' });
         } else {
-            // need to check if currentPlayerPos matches any other players targetTile attribute, and if so, just console log for now
-            const currentPlayerPos = currentGame[currentPlayer].currentPos;
-            console.log(`${currentPlayer} position is ${currentPlayerPos}`);
-            let playerHit;
-
-            Object.keys(currentGame).forEach(key => {
-                if (key !== 'gameStatus' && currentGame[key].targetTile === currentPlayerPos) {
-                    playerHit = true;
-                }
-            })
-
-            if (playerHit) console.log(`${currentPlayer.name} HAS BEEN HIT`);
-
-            // !!! Important! We need to talk about setState. I've only recently learned this, but it's solved a lot of headaches. setState is actually an asynchronous function, it doesn't update the state instantly, it kind of does it in 'batches'. The problem with this arises when you try to run setState more than once in the same function, like we are doing here (the reason I'm doing so is because the 2nd setState depends on the takenTurn value update in the 1st update). The 2nd update only has access to the 'old' state, ie: the 1st update hasn't really come into effect yet. Obviously, this is a problem, so how do we fix it?
-            // SOLUTION: We've been using the setState function one kind of way up until now, by just passing it an object. But, if we pass setState a function with it's parameters set to 'prevState' and 'props' (props is optional), you have more control over the state at any given time. Basically, you have access to the newly updated state via the 'prevState' parameter, which you can then use to update state accordingly. So, all that's different about the syntax is that we pass setState a function (here I'm using an arrow function to be cool) and then you have that function RETURN an object. Hang on, so where's the RETURN statement, you say? Well noticed. With arrow functions you can return an object literal without the RETURN keyword if you just write the object right after the '=>' and then WRAP that entire object in normal parentheses.
-
-            // 1st state update
-            this.setState((prevState) => ({
-                currentGame: Object.assign({}, currentGame, {
-                    gameStatus: 'positioning',
-                    [currentPlayer]: Object.assign({}, currentGame[currentPlayer], {
-                        takenTurn: !currentGame[currentPlayer].takenTurn
-                    })
-                })
-            }))
-
-            // 2nd state update
-            this.setState((prevState) => ({
-                currentPlayer: findNextPlayer.call(this, prevState) ? findNextPlayer.call(this, prevState) : reset(prevState)
-            }))
-
-            document.querySelector('.nextPlayerReadyButton').style.display = "inline-block";
+            this.setCurrentPlayerTurn(true);
+            this.setState({
+                gameStatus: 'positioning',
+                currentPlayer: currentPlayer,
+                currentPlayer: this.getNextPlayer(true)
+            });
 
         }
 
@@ -235,6 +232,37 @@ class Scoreboard extends Component {
 
             return prevState.players[0]
         }
+    }
+
+    setCurrentPlayerTurn(turnTaken) {
+        // set the current players turn taken to true
+        // change current player to next player in array
+        let currentPlayer = this.state.currentPlayer;
+        let players = this.state.players;
+
+        if(turnTaken){
+            currentPlayer.turnTaken = true;
+        } else {
+            // end of round so reset players
+            this.resetTurnsTaken();
+        }
+
+        this.setState({
+            currentPlayer: this.getNextPlayer()
+        })
+    }
+
+    resetTurnsTaken() {
+        // resets all turns taken to false
+        let players = this.state.players;
+
+        for (let player of players) {
+            player.turnTaken = false;
+        }
+
+        this.setState({
+            players: players
+        })
     }
 }
 
